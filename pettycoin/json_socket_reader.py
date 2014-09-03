@@ -3,9 +3,9 @@
 
   TODO:
 
-    - Does not work when the JSON has a '{' in a string. Fix.
+    - Does not work when the JSON has a '{' or '}' inside a string. Fix.
     - Move test to another file.
-
+    -
 '''
 
 import socket_wrapper
