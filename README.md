@@ -1,4 +1,4 @@
 pypettycoin
 ===========
 
-Python code that talks to pettycoin.
+Python 3 code that talks to [Pettycoin](https://github.com/rustyrussell/pettycoin).
