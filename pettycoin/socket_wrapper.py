@@ -1,6 +1,6 @@
 '''
 
-Simple socket wrapper.
+Simple socket wrapper. Is there anything I should be using instead?
 
 '''
 
@@ -12,7 +12,7 @@ import sys
 MAX_RECV_LEN = 4096
 
 class Socket:
-    ''' Just a socket wrapper. Is there anything better I should be using? '''
+    ''' Just a socket wrapper. '''
 
     def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
