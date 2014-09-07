@@ -62,7 +62,7 @@ class Socket:
         ''' Close the socket. '''
         self.is_ok = False
         try:
-            self.sock.shutdown()
+            self.sock.shutdown(socket.SHUT_RDWR)
             self.sock.close()
         except socket.error as error:
             print('Socket.shutdown/close got exception: {}'.format(error),

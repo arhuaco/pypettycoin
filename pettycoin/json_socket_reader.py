@@ -27,14 +27,14 @@ class JsonSocketReader:
         ''' Is the socket healthy? Can we read more? '''
         return self.sock.is_healthy()
 
-    def match_next(self):
+    def match_next(self, timeout):
         ''' Try to match a JSON string. '''
         if len(self.last_chunk) == 0:
             # Mixing bytes and unicode concepts here. Not an issue, we hope.
             #len(bytes('á', 'utf-8')) == 2, len('á') == 1.
             allowed_read_size = self. max_json_reply_size - len(self.json_buff)
             assert allowed_read_size >= 0
-            status, self.last_chunk = self.sock.receive(allowed_read_size)
+            status, self.last_chunk = self.sock.receive(allowed_read_size, timeout)
             if not status:
                 return False
 
@@ -72,7 +72,7 @@ class JsonSocketReader:
         while first_time or timeout >= 0.0:
             time_before = time.time()
             if self.sock.wait_until_read_available(timeout):
-                if self.match_next():
+                if self.match_next(0):
                     return True
             timeout -= time.time() - time_before
             first_time = False
