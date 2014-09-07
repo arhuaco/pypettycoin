@@ -82,7 +82,7 @@ class JsonSocketReader:
 def main():
     ''' Our main function. Only for testing. '''
     sock = socket_wrapper.Socket()
-    if not sock.connect('localhost', 2020):
+    if not sock.connect_inet('localhost', 2020):
         return 1
     sock.make_nonblocking()
     reader = JsonSocketReader(sock)
@@ -91,4 +91,5 @@ def main():
             print('Got json:{}'.format(reader.get_json()), file=sys.stderr)
     return 0
 
-sys.exit(main())
+if __name__ == "__main__":
+    sys.exit(main())

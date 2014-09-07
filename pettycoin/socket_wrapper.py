@@ -14,16 +14,21 @@ MAX_RECV_LEN = 4096
 class Socket:
     ''' Just a socket wrapper. '''
 
-    def __init__(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    def __init__(self, unix_socket=False):
+        if unix_socket:
+            self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        else:
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.unix_socket = unix_socket
         self.is_ok = False
 
     def make_nonblocking(self):
         ''' Make the socket nonblocking. '''
         self.sock.setblocking(0)
 
-    def connect(self, host, port):
-        ''' Connect the socket. '''
+    def connect_inet(self, host, port):
+        assert not self.unix_socket
+        ''' Connect the inet socket. '''
         try:
             self.sock.connect((host, port))
         except socket.error as error:
@@ -32,6 +37,18 @@ class Socket:
             return False
         self.is_ok = True
         return True
+
+    def connect_unix(self, path):
+        ''' Connect the UNIX socket. '''
+        try:
+            self.sock.connect(path)
+        except socket.error as error:
+            print('Socket.connect got exception: {}'.format(error),
+                  file=sys.stderr)
+            return False
+        self.is_ok = True
+        return True
+
 
     def fileno(self):
         '''' Return the file number of this socket. '''
@@ -62,7 +79,7 @@ class Socket:
             print('Socket.sendall got exception: {}'.format(error),
                   file=sys.stderr)
             self.is_ok = error.args[0] != errno.EWOULDBLOCK
-        return False
+        return True
 
     def receive(self, max_len, timeout=None):
         ''' Receive from socket. If timeout is None, read can block. '''
