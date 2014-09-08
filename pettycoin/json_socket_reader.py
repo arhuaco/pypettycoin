@@ -48,6 +48,8 @@ class JsonSocketReader:
             return False
 
         for idx in range(len(self.last_chunk)):
+            if len(self.json_buff) == 0 and self.last_chunk[idx].isspace():
+                continue
             if self.last_chunk[idx] == '{':
                 self.n_open += 1
             elif self.last_chunk[idx] == '}':
