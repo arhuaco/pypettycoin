@@ -6,6 +6,7 @@ from json_socket_reader import JsonSocketReader
 import json
 import logging
 import os
+import pprint
 import socket_wrapper
 import sys
 
@@ -35,9 +36,27 @@ class Pettycoin:
             sys.exit(1)
         self.petty_reader = JsonSocketReader(self.sock)
 
+    def send(self, method='', params=None):
+        ''' Send JSON request. '''
+        if params == None:
+            params = []
+        buff = bytes(make_request(method=method, params=params), 'utf-8')
+        return self.sock.sendall(buff)
+
+    def get_reply(self):
+        ''' Get the Pettycoin reply from UNIX socket. '''
+        status = self.petty_reader.wait_for_json(timeout=1.0)
+        if status:
+            return True, self.petty_reader.get_json_str()
+        return False, ''
+
     def info(self):
         ''' Pettycoin info. '''
-
+        if self.send(method='getinfo'):
+            status, json_str = self.get_reply()
+            if status:
+                return True, pprint.pformat(json.loads(json_str))
+        return False, ''
 
 PTC = Pettycoin()
 
@@ -46,10 +65,15 @@ APP = Flask(__name__)
 @APP.route('/')
 def index():
     ''' Generate the homepage. '''
-    return 'Index Page'
+    status, info_json = PTC.info()
+    if status:
+        return '<pre>{}</pre>'.format(info_json)
+    else:
+        return 'Could not get Pettycoin info.'
 
 def main():
     ''' Our main function. '''
+    logging.basicConfig(level=logging.INFO)
     APP.run(host=HTTP_HOST, port=HTTP_PORT)
 
 if __name__ == '__main__':
