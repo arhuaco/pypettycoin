@@ -28,6 +28,7 @@ def make_request(method, params=None):
 
 class Pettycoin:
     ''' Manage Pettycoin socket and make JSON-RPC calls. '''
+
     def __init__(self):
         self.sock = socket_wrapper.Socket(unix_socket=True)
         self.sock.make_nonblocking()
