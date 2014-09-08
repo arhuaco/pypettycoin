@@ -46,7 +46,7 @@ class Pettycoin:
 
     def get_reply(self):
         ''' Get the Pettycoin reply from UNIX socket. '''
-        status = self.petty_reader.wait_for_json(timeout=1.0)
+        status = self.petty_reader.wait_for_json(timeout=5.0)
         if status:
             return True, self.petty_reader.get_json_str()
         return False, ''
@@ -56,7 +56,10 @@ class Pettycoin:
         if self.send(method='getinfo'):
             status, json_str = self.get_reply()
             if status:
-                return True, pprint.pformat(json.loads(json_str))
+                try:
+                    return True, pprint.pformat(json.loads(json_str))
+                except Exception as err:
+                    logging.error('Could not get info JSON'.format(str(err)))
         return False, ''
 
 PTC = Pettycoin()
