@@ -5,6 +5,7 @@ Simple socket wrapper. Is there anything I should be using instead?
 '''
 
 import errno
+import logging
 import select
 import socket
 import sys
@@ -33,8 +34,7 @@ class Socket:
         try:
             self.sock.connect((host, port))
         except socket.error as error:
-            print('Socket.connect got exception: {}'.format(error),
-                  file=sys.stderr)
+            logging.error('Socket.connect got exception: {}'.format(error))
             return False
         self.is_ok = True
         return True
@@ -45,8 +45,7 @@ class Socket:
         try:
             self.sock.connect(path)
         except socket.error as error:
-            print('Socket.connect got exception: {}'.format(error),
-                  file=sys.stderr)
+            logging.error('Socket.connect got exception: {}'.format(error))
             return False
         self.is_ok = True
         return True
@@ -67,8 +66,7 @@ class Socket:
             self.sock.shutdown(socket.SHUT_RDWR)
             self.sock.close()
         except socket.error as error:
-            print('Socket.shutdown/close got exception: {}'.format(error),
-                  file=sys.stderr)
+            logging.error('Socket close got exception: {}'.format(error))
             return False
         return True
 
@@ -81,8 +79,7 @@ class Socket:
         except socket.error as error:
             self.is_ok = error.args[0] == errno.EWOULDBLOCK
             if not self.is_ok:
-                print('Socket.sendall got exception: {}'.format(error),
-                      file=sys.stderr)
+                logging.error('Socket.sendall got exception: {}'.format(error))
         return self.is_ok
 
     def receive(self, max_len, timeout=None):
@@ -98,8 +95,7 @@ class Socket:
             except socket.error as error:
                 self.is_ok = error.args[0] == errno.EWOULDBLOCK
                 if not self.is_ok:
-                    print('Socket.recv got exception: {}'.format(error),
-                          file=sys.stderr)
+                    logging.error('Socket.recv got exception: {}'.format(error))
             if len(received) == len_before:
                 # When the socket has an error condtion the first time we
                 # might return true but the next call should fail.
@@ -114,6 +110,6 @@ class Socket:
             ready, _, _ = select.select([self.fileno()], [], [], timeout)
             return len(ready) > 0
         except socket.error as error:
-            print('Socket exception: {}'.format(error), file=sys.stderr)
+            logging.error('Socket.select exception: {}'.format(error))
             self.is_ok = False # TODO: Is this OK?
             return False
