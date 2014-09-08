@@ -50,7 +50,6 @@ class Socket:
         self.is_ok = True
         return True
 
-
     def fileno(self):
         '''' Return the file number of this socket. '''
         return self.sock.fileno()
