@@ -8,6 +8,7 @@
     -
 '''
 
+import logging
 import socket_wrapper
 import sys
 import time
@@ -34,14 +35,15 @@ class JsonSocketReader:
             #len(bytes('á', 'utf-8')) == 2, len('á') == 1.
             allowed_read_size = self. max_json_reply_size - len(self.json_buff)
             assert allowed_read_size >= 0
-            status, self.last_chunk = self.sock.receive(allowed_read_size, timeout)
+            status, self.last_chunk = self.sock.receive(allowed_read_size,
+                                                        timeout)
             if not status:
                 return False
 
         try:
             self.last_chunk = bytes.decode(self.last_chunk)
         except UnicodeDecodeError:
-            print('Unicode decode error. Recovering...', file=sys.stderr)
+            logging.warning('Unicode decode error. Recovering...')
             # We probably read an incomplete character. Let's keep reading.
             return False
 
@@ -76,7 +78,7 @@ class JsonSocketReader:
                     return True
             timeout -= time.time() - time_before
             first_time = False
-        print('Timeout in wait_for_json.', file=sys.stderr)
+        logging.error('Timeout in wait_for_json.')
         return False
 
 def main():
