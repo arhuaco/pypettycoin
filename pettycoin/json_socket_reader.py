@@ -63,8 +63,8 @@ class JsonSocketReader:
         self.last_chunk = bytes()
         return False
 
-    def get_json(self):
-        ''' Get the matched json. '''
+    def get_json_str(self):
+        ''' Get the matched JSON. '''
         return self.json_ready
 
     def wait_for_json(self, timeout=0):
@@ -90,7 +90,7 @@ def main():
     reader = JsonSocketReader(sock)
     while reader.should_read_more():
         if reader.wait_for_json(timeout=0.1):
-            print('Got json:{}'.format(reader.get_json()), file=sys.stderr)
+            print('Got json:{}'.format(reader.get_json_str()), file=sys.stderr)
     return 0
 
 if __name__ == "__main__":

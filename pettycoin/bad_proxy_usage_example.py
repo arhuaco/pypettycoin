@@ -2,6 +2,7 @@
 
 import requests
 import json
+import pprint
 import sys
 
 def main():
@@ -17,7 +18,7 @@ def main():
     data = json.dumps(payload)
     try:
         response = requests.post(url, data=data, headers=headers)
-        print('response:', json.loads(response.text))
+        pprint.pprint(json.loads(response.text))
         return 0
     except Exception as error:
         print('Got exception:', error)
