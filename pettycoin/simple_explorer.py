@@ -1,4 +1,8 @@
-''' Let's show some Pettycoin information in the WEB. '''
+'''
+  Let's show some Pettycoin information in the WEB.
+  TODO:
+    - Reconnect UNIX socket if the connection is lost.
+'''
 
 from flask import Flask
 from json_socket_reader import JsonSocketReader
