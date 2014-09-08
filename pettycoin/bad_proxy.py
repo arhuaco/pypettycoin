@@ -73,7 +73,7 @@ class HTTPPettycoinProxy(BaseHTTPRequestHandler):
 
             status = self.petty_sock.sendall(bytes(req_text, 'utf-8'))
             if status:
-                status = self.petty_reader.wait_for_json(timeout=0.5)
+                status = self.petty_reader.wait_for_json(timeout=5.0)
                 if status:
                     petty_response = self.petty_reader.get_json_str()
             if status:
