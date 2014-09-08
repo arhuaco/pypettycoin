@@ -25,10 +25,11 @@ class Socket:
     def make_nonblocking(self):
         ''' Make the socket nonblocking. '''
         self.sock.setblocking(0)
+        return True
 
     def connect_inet(self, host, port):
+        ''' Connet an Internet socket. '''
         assert not self.unix_socket
-        ''' Connect the inet socket. '''
         try:
             self.sock.connect((host, port))
         except socket.error as error:
@@ -39,7 +40,8 @@ class Socket:
         return True
 
     def connect_unix(self, path):
-        ''' Connect the UNIX socket. '''
+        ''' Connect an UNIX socket. '''
+        assert self.unix_socket
         try:
             self.sock.connect(path)
         except socket.error as error:
@@ -72,17 +74,20 @@ class Socket:
 
     def sendall(self, msg, timeout=None):
         ''' Send with timeout. If timeout is None, write can block. '''
+        assert self.is_ok
         self.sock.settimeout(timeout)
         try:
             return self.sock.sendall(msg) == None
         except socket.error as error:
-            print('Socket.sendall got exception: {}'.format(error),
-                  file=sys.stderr)
-            self.is_ok = error.args[0] != errno.EWOULDBLOCK
-        return True
+            self.is_ok = error.args[0] == errno.EWOULDBLOCK
+            if not self.is_ok:
+                print('Socket.sendall got exception: {}'.format(error),
+                      file=sys.stderr)
+        return self.is_ok
 
     def receive(self, max_len, timeout=None):
         ''' Receive from socket. If timeout is None, read can block. '''
+        assert self.is_ok
         self.sock.settimeout(timeout)
         received = bytes()
         while len(received) < max_len:
@@ -91,10 +96,10 @@ class Socket:
                 received += self.sock.recv(min(max_len -
                                                len(received), MAX_RECV_LEN))
             except socket.error as error:
-                print('Socket.recv got exception: {}'.format(error),
-                      file=sys.stderr)
-                assert self.is_ok
-                self.is_ok = error.args[0] != errno.EWOULDBLOCK
+                self.is_ok = error.args[0] == errno.EWOULDBLOCK
+                if not self.is_ok:
+                    print('Socket.recv got exception: {}'.format(error),
+                          file=sys.stderr)
             if len(received) == len_before:
                 # When the socket has an error condtion the first time we
                 # might return true but the next call should fail.
