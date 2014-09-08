@@ -1,8 +1,11 @@
+''' How to use the Bad Pettycoin Proxy. '''
+
 import requests
 import json
 import sys
 
 def main():
+    ''' Main function. '''
     url = 'http://localhost:10001/jsonrpc'
     headers = {'content-type': 'application/json'}
     payload = {
@@ -15,9 +18,10 @@ def main():
     try:
         response = requests.post(url, data=data, headers=headers)
         print('response:', json.loads(response.text))
-    except Exception as e:
-        print('Got exception:', e)
-    return 0
+        return 0
+    except Exception as error:
+        print('Got exception:', error)
+        return 1
 
 if __name__ == "__main__":
     sys.exit(main())
