@@ -8,7 +8,6 @@ import errno
 import logging
 import select
 import socket
-import sys
 
 MAX_RECV_LEN = 4096
 
